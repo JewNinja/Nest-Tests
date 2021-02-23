@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { TestModule } from './test/test.module';
+import { TestModule } from './tests/test.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 

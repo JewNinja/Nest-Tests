@@ -1,7 +1,7 @@
 import { Document } from 'mongoose';
 
 export interface ITest extends Document {
-  readonly type: string;
+  readonly type: any;
   readonly title: string;
   readonly questions: Array<IQuestion>;
   readonly results: Record<string, string>;
