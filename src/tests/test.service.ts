@@ -9,7 +9,7 @@ import { UpdateTestDto } from './dto/update-test.dto';
 export class TestService {
   constructor(@InjectModel('Test') private readonly testModel: Model<ITest>) {}
 
-  async find(order, filter, page, perPage): Promise<any> {
+  async find(order, filter, page, perPage): Promise<ITest[]> {
     return await this.testModel
       .find()
       .sort({ _id: 'asc' })
@@ -19,21 +19,16 @@ export class TestService {
   }
 
   async create(test: CreateTestDto): Promise<ITest> {
-    debugger;
     const createdTest = new this.testModel(test);
-    debugger;
+
     return await createdTest.save(); // TODO: почему save, а не create?
   }
 
-  async update(id: string, test: UpdateTestDto): Promise<ITest> { // TODO: возвращаемые типы поправить
-    debugger;
-    const res = this.testModel.findByIdAndUpdate(id, test, { new: true });
-    debugger;
-    return res;
+  async update(id: string, test: UpdateTestDto): Promise<ITest> {
+    return this.testModel.findByIdAndUpdate(id, test, { new: true });
   }
 
-  async delete(id): Promise<any> {
-    debugger;
+  async delete(id): Promise<number> {
     const res = await this.testModel.deleteOne({ _id: id });
     // const res = await this.testModel.findByIdAndRemove(id);
 
@@ -44,12 +39,12 @@ export class TestService {
     }
   }
 
-  async busy(field, value): Promise<any> {
+  async busy(field, value): Promise<string | boolean> {
     const res = await this.testModel
       .find({ [field]: value })
       .limit(10)
       .exec();
-    debugger;
+
     if (!res) {
       return false;
     } else if (res.length === 0) {

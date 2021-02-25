@@ -36,6 +36,6 @@ export const TestSchema = new mongoose.Schema({
 //   @Prop()
 //   name: string;
 // }
-// export const TestSchema = SchemaFactory.createForClass(Test);
+// export const UserSchema = SchemaFactory.createForClass(Test);
 
 // UserSchema.index({ email: 1 }, { unique: true });
