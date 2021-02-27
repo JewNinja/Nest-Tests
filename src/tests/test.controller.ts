@@ -18,7 +18,10 @@ import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { BusyCheckDto } from './dto/busy-check.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('tests')
+@ApiBearerAuth()
 @Controller('tests')
 export class TestController {
   constructor(private readonly testService: TestService) {}

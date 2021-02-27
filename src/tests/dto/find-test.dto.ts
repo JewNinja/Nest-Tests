@@ -1,7 +1,8 @@
-import { IQuestion } from '../interfaces/test.interface';
-import { IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class FindTestDto {
+  @ApiProperty()
   page: number;
+  @ApiProperty()
   perPage: number;
 }

@@ -8,7 +8,7 @@ import { IRefreshToken } from './interfaces/refresh-token.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { LIFETIMES } from './auth.module';
 import { INewUser } from 'src/users/interfaces/user.interface';
-
+import { SHA3 } from 'sha3';
 
 @Injectable()
 export class AuthService {
@@ -20,13 +20,18 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.userService.findOne({ email });
-    if (user && user.password === pass) {
+    if (user && user.password === new SHA3(256).update(pass).digest('hex')) {
       return this.generateTokensForUser(user)
     }
     return null;
   }
 
-  async signupUser(userData): Promise<any> {
+  async signupUser(signupDto): Promise<any> {
+    const userData = {
+      ...signupDto,
+      password: new SHA3(256).update(signupDto.password).digest('hex'),
+    }
+
     const user = await this.userService.findOne({ email: userData.email });
     if (user && user.password === userData.password) {
       return this.generateTokensForUser(user)
