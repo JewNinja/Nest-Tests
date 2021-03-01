@@ -45,8 +45,8 @@ export class AuthService {
 
   generateTokensForUser(user) {
     const res = {
-      access_token: this.generateToken({ email: user.email }),
-      refresh_token: this.generateRefreshToken({ type: 'refreshToken', secret: this.configService.get('JWT_SECRET'), userId: user._id, email: user.email }),
+      access_token: this.generateToken({ email: user.email, roles: user.roles }),
+      refresh_token: this.generateRefreshToken({ type: 'refreshToken', secret: this.configService.get('JWT_SECRET'), userId: user._id, email: user.email, roles: user.roles }),
       expiresIn: moment().add(LIFETIMES.TOKEN, 'hours').format(),
     }
     this.replaceRefreshTokenInDb(res.refresh_token, user._id)
@@ -83,10 +83,9 @@ export class AuthService {
     ) {
       const refreshTokenFromDb = await this.refreshTokenModel.findOne({ userId: verifiedData.userId }).exec()
       if (refreshTokenFromDb && refreshTokenFromDb.refreshToken === refreshToken && moment(refreshTokenFromDb.expiresIn).valueOf() - moment().valueOf() > 0) {
-        return this.generateTokensForUser({ _id: verifiedData.userId, email: verifiedData.email })
+        return this.generateTokensForUser({ _id: verifiedData.userId, email: verifiedData.email, roles: verifiedData.roles })
       }
       return false
     }
   }
-
 }

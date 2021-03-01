@@ -15,6 +15,6 @@ export class UserService {
   }
 
   create(user: CreateUserDto): Promise<IUser> {
-    return new this.userModel(user).save();
+    return new this.userModel({ ...user, roles: ['user'] }).save();
   }
 }

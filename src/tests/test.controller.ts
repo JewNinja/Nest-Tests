@@ -11,6 +11,7 @@ import {
   HttpStatus,
   HttpException,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { TestService } from './test.service';
 import { FindTestDto } from './dto/find-test.dto';
@@ -19,39 +20,43 @@ import { UpdateTestDto } from './dto/update-test.dto';
 import { BusyCheckDto } from './dto/busy-check.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ValidatePagerPipe } from './pipes/validate-pager.pipe';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @ApiTags('tests')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 @ApiBearerAuth()
+// @UseFilters(HttpExceptionFilter) // можно и отдельно на метод/маршрут  // можно сделать глобальный фильтр через app. (там пример)
 @Controller('tests')
 export class TestController {
   constructor(private readonly testService: TestService) {}
 
-  @UseGuards(AuthGuard('jwt'))
   @Get()
-  async find(@Query(new ValidationPipe()) query: FindTestDto) {
-    const tests = await this.testService.find(
-      {},
-      {},
-      +query.page, // TODO: разобраться с этой хернёй
-      +query.perPage,
-    );
+  @UsePipes(new ValidatePagerPipe('page', 'perPage'))
+  async find(
+    @Query(new ValidationPipe()) query: FindTestDto,
+    // @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    // @Query('perPage', new DefaultValuePipe(200), ParseIntPipe) perPage: number
+  ) {
+    const tests = await this.testService.find({}, {}, query.page, query.perPage);
+    
     return { data: tests };
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Post()
   async create(@Body(new ValidationPipe()) createTestDto: CreateTestDto) {
     return await this.testService.create(createTestDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
+  @Roles('admin')
   async update(@Param('id') id: string, @Body(new ValidationPipe()) updateTestDto: UpdateTestDto) {
     return await this.testService.update(id, updateTestDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
+  @Roles('admin')
   async delete(@Param('id') id: string) {
     const res = await this.testService.delete(id);
 
@@ -63,7 +68,6 @@ export class TestController {
     }
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Get('/busy')
   async busy(@Query(new ValidationPipe()) busyCheckDto: BusyCheckDto) {
     return await this.testService.busy(busyCheckDto.key, busyCheckDto.value);

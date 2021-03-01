@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { TestModule } from './tests/test.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { configModule } from './configure.root';
 import { AuthModule } from './auth/auth.module';
+import { LoggerMiddleware } from './tests/middleware/logger.middleware';
 
 @Module({
   imports: [
@@ -17,4 +18,12 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      // .forRoutes('tests');
+      // .forRoutes('');
+      .forRoutes('other');
+  }
+}
