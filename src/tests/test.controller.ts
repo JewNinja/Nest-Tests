@@ -19,13 +19,16 @@ import { CreateTestDto } from './dto/create-test.dto';
 import { UpdateTestDto } from './dto/update-test.dto';
 import { BusyCheckDto } from './dto/busy-check.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ValidatePagerPipe } from './pipes/validate-pager.pipe';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { Test } from './entities/test.entitie';
 
 @ApiTags('tests')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(AuthGuard('jwt'), RolesGuard, ThrottlerGuard)
+// @UseInterceptors(LoggingInterceptor)
 @ApiBearerAuth()
 // @UseFilters(HttpExceptionFilter) // можно и отдельно на метод/маршрут  // можно сделать глобальный фильтр через app. (там пример)
 @Controller('tests')
@@ -33,6 +36,7 @@ export class TestController {
   constructor(private readonly testService: TestService) {}
 
   @Get()
+  @ApiResponse({ type: [Test] })
   @UsePipes(new ValidatePagerPipe('page', 'perPage'))
   async find(
     @Query(new ValidationPipe()) query: FindTestDto,
@@ -45,11 +49,13 @@ export class TestController {
   }
 
   @Post()
+  @ApiResponse({ type: Test })
   async create(@Body(new ValidationPipe()) createTestDto: CreateTestDto) {
     return await this.testService.create(createTestDto);
   }
 
   @Put(':id')
+  @ApiResponse({ type: Test })
   @Roles('admin')
   async update(@Param('id') id: string, @Body(new ValidationPipe()) updateTestDto: UpdateTestDto) {
     return await this.testService.update(id, updateTestDto);
@@ -69,6 +75,7 @@ export class TestController {
   }
 
   @Get('/busy')
+  @ApiResponse({ description: 'string | boolean' })
   async busy(@Query(new ValidationPipe()) busyCheckDto: BusyCheckDto) {
     return await this.testService.busy(busyCheckDto.key, busyCheckDto.value);
   }

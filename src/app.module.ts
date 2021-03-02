@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { configModule } from './configure.root';
 import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './tests/middleware/logger.middleware';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -14,6 +15,10 @@ import { LoggerMiddleware } from './tests/middleware/logger.middleware';
     MongooseModule.forRoot(process.env.MONGODB_WRITE_CONNECTION_STRING, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+    }),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
     }),
     AuthModule,
   ],

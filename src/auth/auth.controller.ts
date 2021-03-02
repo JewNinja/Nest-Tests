@@ -3,9 +3,11 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ITokenResponse } from './interfaces/token-response.interface';
 
 @ApiTags('auth')
+@ApiResponse({ type: [ITokenResponse] })
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
