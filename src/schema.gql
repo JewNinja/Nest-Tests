@@ -1,0 +1,32 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type BlackboxData {
+  added_picture: String!
+  is_used: Boolean!
+  pictures: [String!]!
+}
+
+type BlackboxPictures {
+  images_paths: [String!]!
+}
+
+type Mutation {
+  addBlackboxPicture(file: Upload!): Boolean!
+}
+
+type Query {
+  giveBlackboxPictures(number: Float!): BlackboxPictures!
+  giveUserDetails(email: String, id: String): UserModel!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+type UserModel {
+  blackbox: BlackboxData!
+  email: String!
+  id: Float!
+  roles: [String!]!
+}

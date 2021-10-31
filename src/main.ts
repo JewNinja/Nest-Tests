@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+// import { GqlHttpExceptionFilter } from './blackbox/filter/gql-http-exception.filter';
+// import { HttpExceptionFilter } from './tests/filter/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -25,6 +27,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  // app.useGlobalInterceptors(new ResponseInterceptor());
+  // app.useGlobalFilters(new GqlHttpExceptionFilter());
   // app.useGlobalFilters(new HttpExceptionFilter());  // так можно сделать глобальный фильтр
 
   await app.listen(3003);

@@ -21,7 +21,7 @@ export class TestService {
   async create(test: CreateTestDto): Promise<ITest> {
     const createdTest = new this.testModel(test);
 
-    return await createdTest.save(); // TODO: почему save, а не create?
+    return await createdTest.save();
   }
 
   async update(id: string, test: UpdateTestDto): Promise<ITest> {

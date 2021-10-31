@@ -7,7 +7,6 @@ import { Model } from 'mongoose';
 import { IRefreshToken } from './interfaces/refresh-token.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { LIFETIMES } from './auth.module';
-import { INewUser } from 'src/users/interfaces/user.interface';
 import { SHA3 } from 'sha3';
 
 @Injectable()
@@ -45,7 +44,7 @@ export class AuthService {
 
   generateTokensForUser(user) {
     const res = {
-      access_token: this.generateToken({ email: user.email, roles: user.roles }),
+      access_token: this.generateToken({ userId: user._id, email: user.email, roles: user.roles }),
       refresh_token: this.generateRefreshToken({ type: 'refreshToken', secret: this.configService.get('JWT_SECRET'), userId: user._id, email: user.email, roles: user.roles }),
       expiresIn: moment().add(LIFETIMES.TOKEN, 'hours').format(),
     }
@@ -65,7 +64,8 @@ export class AuthService {
     const isExist = await this.refreshTokenModel.exists({ userId })
     isExist
       ? this.refreshTokenModel.findOneAndUpdate({ userId }, { refreshToken, expiresIn: moment().add(LIFETIMES.REFRESH, 'hours').format() }).exec()
-      : this.refreshTokenModel.create({ refreshToken, userId, expiresIn: moment().add(LIFETIMES.REFRESH, 'hours').format() });
+      // : this.refreshTokenModel.create({ refreshToken, userId, expiresIn: moment().add(LIFETIMES.REFRESH, 'hours').format() });      // отрабатывает так же
+      : new this.refreshTokenModel({ refreshToken, userId, expiresIn: moment().add(LIFETIMES.REFRESH, 'hours').format() }).save();
   }
 
   async refreshToken(refreshToken) {
